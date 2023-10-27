@@ -6,7 +6,7 @@ param (
 
 #Validate output $filename
 if ($Filename) {
-    if (-not ($Filename.EndsWith('.xlsx'))) {
+    if (-not ($Filename.EndsWith('.xlsx') -or $Filename.EndsWith('.csv'))) {
         Write-Warning ("Specified {0} filename does not end with .xlsx, exiting..." -f $Filename)
         return
     }
@@ -88,8 +88,13 @@ if ($Total.Count -gt 0) {
     }
     else {
         $Date = Get-Date -Format 'dd-MM-yyyy HH-mm'
-        $Total | Export-Excel -Path $Filename -WorksheetName "Services_$($Date)" -AutoFilter -AutoSize -Append
-        Write-Host ("Exported Non-Microsoft Signed Services to {0}" -f $Filename) -ForegroundColor Green
+        if ($Filename.EndsWith('.xlsx')){
+            $Total | Export-Excel -Path $Filename -WorksheetName "Services_$($Date)" -AutoFilter -AutoSize -Append
+            Write-Host ("Exported Non-Microsoft Signed Services to {0}" -f $Filename) -ForegroundColor Green
+        }
+        else {
+            $Total | Export-Csv -LiteralPath $Filename    
+        }
     } 
 }
 else {
